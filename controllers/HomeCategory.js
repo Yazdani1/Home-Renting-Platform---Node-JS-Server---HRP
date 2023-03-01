@@ -2,7 +2,7 @@ const slugify = require("slugify");
 
 const HomeCategory = require("../model/HomeCategory");
 const HomeRentPost = require("../model/HomeRentPost");
-require("dotenv").config();
+
 
 exports.createHomeCategory = async (req, res) => {
   try {

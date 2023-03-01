@@ -20,10 +20,10 @@ router.post("/registration", userRegistration);
 router.post("/login", userLogin);
 
 /**
- * @Object - It will return a list of all the users and only admin will have access on it.
+ * @Object - It will return a list of all the users .
  */
 
-router.get("/alluser", requireLogin, isAdmin, getAllUser);
+router.get("/alluser", getAllUser);
 
 /**
  * It will retunr only loged in user information and it willbe used to make protected route for the admin area
