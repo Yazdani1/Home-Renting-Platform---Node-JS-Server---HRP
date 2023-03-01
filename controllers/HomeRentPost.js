@@ -1,7 +1,6 @@
 const slugify = require("slugify");
 
 const HomeRentPost = require("../model/HomeRentPost");
-require("dotenv").config();
 
 exports.createHomeRentPost = async (req, res) => {
   try {
@@ -97,7 +96,7 @@ exports.createHomeRentPost = async (req, res) => {
 exports.getAllHomeRentPost = async (req, res) => {
   try {
     const allHomeRent = await HomeRentPost.find({ visibility: "Public" })
-      .populate("postedBy", "_id slug name")
+      .populate("postedBy", "_id slug name role")
       .populate("categoryBy", "_id categoryName slug")
       .sort({ date: -1 });
 
@@ -167,7 +166,6 @@ exports.getHomeRentalDetailsPost = async (req, res) => {
       .populate("categoryBy", "_id categoryName slug")
       .sort({ date: -1 });
 
-      console.log( singleHomeRentalPost.categoryBy._id.toString());
     // To get simmilar post based on the city
 
     const morePostsByCity = await HomeRentPost.find({
@@ -175,7 +173,6 @@ exports.getHomeRentalDetailsPost = async (req, res) => {
       city: singleHomeRentalPost.city,
       visibility: "Public",
       postedBy: { $ne: singleHomeRentalPost.postedBy._id.toString() },
-
     })
       .populate("postedBy", "_id slug name")
       .populate("categoryBy", "_id categoryName slug")
@@ -190,17 +187,59 @@ exports.getHomeRentalDetailsPost = async (req, res) => {
     })
       .populate("postedBy", "_id slug name")
       .populate("categoryBy", "_id categoryName slug")
+      .sort({ date: -1 })
+      .limit(9);
+
+    res.status(200).json({
+      singleHomeRentalPost,
+      morePostsByCategory,
+      morePostsByCity,
+      morePostsBySameUser,
+    });
+  } catch (error) {
+    res.status(400).json({ error: "Something went wrong" });
+  }
+};
+
+/**
+ * To get loged in user posts
+ */
+
+exports.getLogedInuserPosts = async (req, res) => {
+  try {
+    const logedInUserAllposts = await HomeRentPost.find({
+      postedBy: req.user._id,
+    })
+      .populate("postedBy", "_id slug name")
+      .populate("categoryBy", "_id categoryName slug")
       .sort({ date: -1 });
 
-    res
-      .status(200)
-      .json({
-        singleHomeRentalPost,
-        morePostsByCategory,
-        morePostsByCity,
-        morePostsBySameUser,
-      });
+    res.status(200).json(logedInUserAllposts);
   } catch (error) {
+    res.status(400).json({ error: "Something went wrong" });
+  }
+};
+
+/**
+ * To search home rent posts
+ */
+
+exports.searchHomeRentPosts = async (req, res) => {
+  const { min, max } = req.query;
+  try {
+    const searchResults = await HomeRentPost.find({
+      rentAmount: { $gte: min | 1, $lte: max || 99999 },
+      ...(req.query.room && { rooms: req.query.room.split(",") }),
+      ...(req.query.city && { city: req.query.city.split(",") }),
+      ...(req.query.category && { categoryBy: req.query.category.split(",") }),
+    })
+      .populate("postedBy", "_id slug name")
+      .populate("categoryBy", "_id categoryName slug")
+      .sort({ date: -1 });
+
+    res.status(200).json(searchResults);
+  } catch (error) {
+    console.log(error);
     res.status(400).json({ error: "Something went wrong" });
   }
 };

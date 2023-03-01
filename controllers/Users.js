@@ -2,7 +2,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const slugify = require("slugify");
 const User = require("../model/Users");
-require("dotenv").config();
 
 // to register
 exports.userRegistration = async (req, res) => {
@@ -88,7 +87,7 @@ exports.userLogin = async (req, res) => {
 
 exports.getAllUser = async (req, res) => {
   try {
-    const userlist = await User.find().sort({ date: -1 });
+    const userlist = await User.find({ role: "Subscriber" }).sort({ date: -1 });
     res.status(200).json(userlist);
   } catch (error) {
     res.status(400).json({ error: "Something Went Wrong, Could not Log In" });
