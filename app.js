@@ -20,8 +20,7 @@ app.use("/api/v0",require("./routers/HomeCategory"));
 app.use("/api/v0",require("./routers/HomeRentPost"));
 app.use("/api/v0",require("./routers/UserProfile"));
 app.use("/api/v0",require("./routers/PhotoLibrary"));
-
-// app.use("/api",require("./router/ExpenseCategory"));
+app.use("/api/v0",require("./routers/Wishlist"));
 // app.use("/api",require("./router/ExpenseList"));
 
 app.listen(port, (req, res) => {
